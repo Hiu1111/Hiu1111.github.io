@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Your Name — Developer & Builder</title>
+<title>Hiu Cheung</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%230a0a0f'/%3E%3Ctext x='50' y='50' font-family='Georgia,serif' font-size='52' font-weight='500' fill='%23f5f5f7' text-anchor='middle' dominant-baseline='central'%3Eh%3Ctspan fill='%23d4ff3a' font-style='italic'%3Ec%3C/tspan%3E%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700;9..144,800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -524,6 +525,34 @@
     border: 0;
   }
 
+  /* Project gallery (screenshots) */
+  .project-gallery {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.875rem;
+    margin-top: 1.75rem;
+  }
+  .project-gallery img {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    object-position: top left;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: #fafafa;
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    display: block;
+  }
+  .project-gallery img:hover {
+    transform: scale(1.02);
+    border-color: var(--accent);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+  }
+  @media (max-width: 768px) {
+    .project-gallery { grid-template-columns: 1fr; }
+  }
+
   @media (max-width: 768px) {
     .project {
       grid-template-columns: 1fr;
@@ -714,7 +743,7 @@
 
 <nav>
   <div class="nav-inner">
-    <a href="#" class="nav-logo">hiu<span>.dev</span></a>
+    <a href="#" class="nav-logo">Hiu <span>Cheung</span></a>
     <ul class="nav-links">
       <li><a href="#about">01 — About</a></li>
       <li><a href="#projects">02 — Work</a></li>
@@ -798,7 +827,7 @@
 
     <div class="projects">
 
-      <a href="https://github.com/Hiu1111/job-tracker-agent" target="_blank" rel="noopener" class="project reveal">
+      <a href="pursuit.html" class="project reveal">
         <div class="project-num mono">/ 01</div>
         <div class="project-content">
           <h3>Pursuit — AI Job Tracker</h3>
