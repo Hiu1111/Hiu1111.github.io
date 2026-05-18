@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Relay — Hiu Cheung</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%230a0a0f'/%3E%3Ctext x='50' y='50' font-family='Georgia,serif' font-size='52' font-weight='500' fill='%23f5f5f7' text-anchor='middle' dominant-baseline='central'%3Eh%3Ctspan fill='%23d4ff3a' font-style='italic'%3Ec%3C/tspan%3E%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700;9..144,800;9..144,900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0a0f;
+    --bg-elevated: #12121a;
+    --surface: #1a1a26;
+    --border: rgba(255, 255, 255, 0.08);
+    --border-strong: rgba(255, 255, 255, 0.16);
+    --text: #f5f5f7;
+    --text-dim: #a1a1b3;
+    --text-faint: #6b6b80;
+    --accent: #d4ff3a;
+    --accent-glow: #d4ff3a40;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 400;
+    line-height: 1.6;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+    mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(circle at 20% 15%, rgba(255, 165, 0, 0.06) 0%, transparent 40%),
+      radial-gradient(circle at 80% 75%, rgba(212, 255, 58, 0.05) 0%, transparent 40%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .mono { font-family: 'JetBrains Mono', monospace; }
+  a { color: inherit; text-decoration: none; }
+
+  /* TOP BAR */
+  .topbar {
+    position: sticky;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 1.5rem 2rem;
+    z-index: 50;
+    backdrop-filter: blur(20px);
+    background: rgba(10, 10, 15, 0.6);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8125rem;
+    color: var(--text-dim);
+    transition: color 0.25s ease, gap 0.25s ease;
+  }
+  .back-link:hover {
+    color: var(--accent);
+    gap: 1rem;
+  }
+  .topbar-logo {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .topbar-logo span { color: var(--accent); }
+
+  /* HERO */
+  .hero {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 5rem 2rem 3rem;
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 5rem;
+    align-items: end;
+  }
+  .hero-left .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    color: var(--accent);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .hero-left .eyebrow::before {
+    content: '';
+    width: 32px;
+    height: 1px;
+    background: var(--accent);
+  }
+  .hero-title {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(4.5rem, 14vw, 11rem);
+    font-weight: 400;
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+    margin-bottom: 1.5rem;
+  }
+  .hero-title em {
+    background: linear-gradient(135deg, #ff9d4d 0%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-style: italic;
+    font-weight: 300;
+  }
+  .hero-tagline {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(1.25rem, 2.2vw, 1.625rem);
+    font-style: italic;
+    font-weight: 300;
+    line-height: 1.4;
+    color: var(--text-dim);
+    max-width: 30ch;
+  }
+
+  .hero-right {
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+    padding-bottom: 0.5rem;
+  }
+  .meta-block {
+    border-left: 1px solid var(--border-strong);
+    padding-left: 1.5rem;
+  }
+  .meta-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--text-faint);
+    margin-bottom: 0.625rem;
+  }
+  .meta-value {
+    font-family: 'Fraunces', serif;
+    font-size: 1.0625rem;
+    color: var(--text);
+    line-height: 1.4;
+  }
+  .meta-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+    margin-top: 0.5rem;
+  }
+  .stack-pill {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6875rem;
+    padding: 0.25rem 0.625rem;
+    border: 1px solid var(--border-strong);
+    border-radius: 999px;
+    color: var(--text-dim);
+  }
+
+  @media (max-width: 900px) {
+    .hero {
+      grid-template-columns: 1fr;
+      gap: 3rem;
+      padding-top: 3rem;
+    }
+    .hero-right { flex-direction: row; flex-wrap: wrap; gap: 1.5rem 2rem; }
+    .meta-block { flex: 1 1 200px; }
+  }
+
+  /* DIAGRAM SHOWCASE */
+  .showcase {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 2rem 2rem 4rem;
+    position: relative;
+    z-index: 1;
+  }
+  .showcase-frame {
+    border-radius: 24px;
+    overflow: hidden;
+    border: 1px solid var(--border-strong);
+    background:
+      radial-gradient(ellipse at top left, rgba(255, 165, 0, 0.06), transparent 50%),
+      radial-gradient(ellipse at bottom right, rgba(212, 255, 58, 0.06), transparent 50%),
+      var(--bg-elevated);
+    position: relative;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+    padding: 3rem 2rem;
+  }
+  .arch-svg {
+    width: 100%;
+    height: auto;
+    display: block;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .arch-svg .node-bg {
+    fill: var(--bg);
+    stroke: var(--border-strong);
+    stroke-width: 1.5;
+  }
+  .arch-svg .node-text {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    fill: var(--text);
+    font-weight: 500;
+  }
+  .arch-svg .node-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    fill: var(--text-faint);
+    letter-spacing: 0.05em;
+  }
+  .arch-svg .stage-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    fill: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    font-weight: 500;
+  }
+  .arch-svg .flow-line {
+    stroke: var(--accent);
+    stroke-width: 1.5;
+    fill: none;
+    stroke-dasharray: 4 4;
+    animation: dash 1s linear infinite;
+  }
+  @keyframes dash {
+    to { stroke-dashoffset: -8; }
+  }
+  .arch-svg .flow-arrow {
+    fill: var(--accent);
+  }
+  .arch-svg .branch-line {
+    stroke: var(--border-strong);
+    stroke-width: 1;
+    fill: none;
+  }
+  .arch-svg .orchestrator-bg {
+    fill: rgba(212, 255, 58, 0.04);
+    stroke: var(--accent);
+    stroke-width: 1;
+    stroke-dasharray: 3 3;
+  }
+  .showcase-caption {
+    margin-top: 1.25rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+  .showcase-caption .num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--text-faint);
+    letter-spacing: 0.1em;
+  }
+  .showcase-caption .desc {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    color: var(--text-dim);
+    font-size: 0.9375rem;
+  }
+
+  /* STORY */
+  .story {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 5rem 2rem 4rem;
+    position: relative;
+    z-index: 1;
+  }
+  .story-grid {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 4rem;
+    align-items: start;
+  }
+  .story-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    color: var(--accent);
+    padding-top: 0.5rem;
+  }
+  .story-body { max-width: 720px; }
+  .story-body p {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(1.25rem, 1.8vw, 1.5rem);
+    line-height: 1.55;
+    color: var(--text);
+    font-weight: 300;
+  }
+  .story-body p + p { margin-top: 1.5rem; }
+  .story-body strong {
+    color: var(--accent);
+    font-weight: 500;
+  }
+  @media (max-width: 900px) {
+    .story-grid { grid-template-columns: 1fr; gap: 1rem; }
+  }
+
+  /* STAGES — pipeline broken down */
+  .stages {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 2rem 2rem 4rem;
+    position: relative;
+    z-index: 1;
+  }
+  .stages-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    color: var(--accent);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .stages-label::before {
+    content: '';
+    width: 32px;
+    height: 1px;
+    background: var(--accent);
+  }
+  .stages-title {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(2rem, 4vw, 2.75rem);
+    font-weight: 400;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 3rem;
+    max-width: 600px;
+  }
+  .stages-title em {
+    font-style: italic;
+    font-weight: 300;
+    color: var(--accent);
+  }
+  .stages-list {
+    display: flex;
+    flex-direction: column;
+  }
+  .stage {
+    display: grid;
+    grid-template-columns: 80px 220px 1fr;
+    gap: 2rem;
+    padding: 2rem 0;
+    border-top: 1px solid var(--border);
+    align-items: start;
+  }
+  .stage:last-child { border-bottom: 1px solid var(--border); }
+  .stage-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    padding-top: 0.4rem;
+  }
+  .stage-name {
+    font-family: 'Fraunces', serif;
+    font-size: 1.375rem;
+    font-weight: 500;
+    color: var(--text);
+    letter-spacing: -0.01em;
+  }
+  .stage-name .tech {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--text-faint);
+    font-weight: 400;
+    margin-top: 0.5rem;
+    letter-spacing: 0.05em;
+  }
+  .stage-desc {
+    font-size: 1rem;
+    color: var(--text-dim);
+    line-height: 1.7;
+    max-width: 600px;
+    padding-top: 0.3rem;
+  }
+  @media (max-width: 768px) {
+    .stage { grid-template-columns: 1fr; gap: 0.75rem; }
+    .stage-num { padding-top: 0; }
+  }
+
+  /* FEATURES */
+  .features {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 4rem 2rem 5rem;
+    position: relative;
+    z-index: 1;
+  }
+  .features-header {
+    margin-bottom: 3rem;
+    max-width: 600px;
+  }
+  .features-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    color: var(--accent);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .features-label::before {
+    content: '';
+    width: 32px;
+    height: 1px;
+    background: var(--accent);
+  }
+  .features-title {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(2rem, 4vw, 2.75rem);
+    font-weight: 400;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+  .features-title em {
+    font-style: italic;
+    font-weight: 300;
+    color: var(--accent);
+  }
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+  .feature {
+    padding: 2rem;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: var(--bg-elevated);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .feature::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .feature:hover {
+    border-color: var(--border-strong);
+    transform: translateY(-3px);
+  }
+  .feature:hover::before { opacity: 1; }
+  .feature-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--accent);
+    margin-bottom: 1rem;
+    letter-spacing: 0.1em;
+  }
+  .feature h3 {
+    font-family: 'Fraunces', serif;
+    font-size: 1.375rem;
+    font-weight: 500;
+    line-height: 1.2;
+    margin-bottom: 0.75rem;
+    letter-spacing: -0.01em;
+  }
+  .feature p {
+    font-size: 0.9375rem;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+  @media (max-width: 900px) {
+    .features-grid { grid-template-columns: 1fr; }
+  }
+
+  /* CTA */
+  .cta {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 3rem 2rem 6rem;
+    position: relative;
+    z-index: 1;
+  }
+  .cta-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 3rem;
+    border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+    gap: 1.5rem;
+  }
+  .cta-text {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 400;
+    line-height: 1.2;
+    max-width: 32ch;
+  }
+  .cta-text em {
+    font-style: italic;
+    font-weight: 300;
+    color: var(--accent);
+  }
+  .cta-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+  .cta-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.875rem 1.5rem;
+    border-radius: 999px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    border: 1px solid var(--border-strong);
+    background: transparent;
+    color: var(--text);
+    transition: all 0.25s ease;
+    cursor: pointer;
+  }
+  .cta-btn:hover {
+    border-color: var(--text);
+    background: rgba(255,255,255,0.04);
+  }
+  .cta-btn.primary {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+  }
+  .cta-btn.primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px var(--accent-glow);
+  }
+  .cta-btn svg { transition: transform 0.25s ease; }
+  .cta-btn:hover svg { transform: translate(2px, -2px); }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 2rem;
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--text-faint);
+    letter-spacing: 0.05em;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* SCROLL REVEAL */
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a href="index.html" class="back-link">
+      <span>←</span>
+      <span>All projects</span>
+    </a>
+    <a href="index.html" class="topbar-logo">Hiu <span>Cheung</span></a>
+  </div>
+</div>
+
+<section class="hero">
+  <div class="hero-left">
+    <div class="eyebrow">Project 03 / Cloud Data Engineering</div>
+    <h1 class="hero-title">Re<em>lay</em></h1>
+    <p class="hero-tagline">Raw sales data goes in. Clean, queryable insights come out — on the same pipeline, every time.</p>
+  </div>
+
+  <div class="hero-right">
+    <div class="meta-block">
+      <div class="meta-label">Role</div>
+      <div class="meta-value">Solo build — data engineering</div>
+    </div>
+    <div class="meta-block">
+      <div class="meta-label">Stack</div>
+      <div class="meta-stack">
+        <span class="stack-pill">AWS Glue</span>
+        <span class="stack-pill">RDS</span>
+        <span class="stack-pill">Terraform</span>
+        <span class="stack-pill">Jenkins</span>
+        <span class="stack-pill">Python</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="showcase reveal">
+  <div class="showcase-frame">
+    <svg class="arch-svg" viewBox="0 0 1000 360" xmlns="http://www.w3.org/2000/svg">
+      <!-- Stage labels -->
+      <text x="100" y="30" class="stage-label" text-anchor="middle">EXTRACT</text>
+      <text x="340" y="30" class="stage-label" text-anchor="middle">TRANSFORM</text>
+      <text x="580" y="30" class="stage-label" text-anchor="middle">LOAD</text>
+      <text x="820" y="30" class="stage-label" text-anchor="middle">REPORT</text>
+
+      <!-- Stage divider lines -->
+      <line x1="220" y1="20" x2="220" y2="280" class="branch-line" />
+      <line x1="460" y1="20" x2="460" y2="280" class="branch-line" />
+      <line x1="700" y1="20" x2="700" y2="280" class="branch-line" />
+
+      <!-- Node 1: Source CSV / S3 -->
+      <rect x="40" y="130" width="120" height="80" rx="12" class="node-bg" />
+      <text x="100" y="165" text-anchor="middle" class="node-text">Raw Sales</text>
+      <text x="100" y="183" text-anchor="middle" class="node-text">Data → S3</text>
+      <text x="100" y="200" text-anchor="middle" class="node-sub">CSV / JSON</text>
+
+      <!-- Node 2: AWS Glue -->
+      <rect x="280" y="130" width="120" height="80" rx="12" class="node-bg" />
+      <text x="340" y="165" text-anchor="middle" class="node-text">AWS Glue</text>
+      <text x="340" y="183" text-anchor="middle" class="node-text">+ Python</text>
+      <text x="340" y="200" text-anchor="middle" class="node-sub">clean · derive · cast</text>
+
+      <!-- Node 3: PostgreSQL on RDS -->
+      <rect x="520" y="130" width="120" height="80" rx="12" class="node-bg" />
+      <text x="580" y="165" text-anchor="middle" class="node-text">PostgreSQL</text>
+      <text x="580" y="183" text-anchor="middle" class="node-text">on RDS</text>
+      <text x="580" y="200" text-anchor="middle" class="node-sub">structured tables</text>
+
+      <!-- Node 4: Excel report -->
+      <rect x="760" y="130" width="120" height="80" rx="12" class="node-bg" />
+      <text x="820" y="165" text-anchor="middle" class="node-text">Excel Reports</text>
+      <text x="820" y="183" text-anchor="middle" class="node-text">OpenPyXL</text>
+      <text x="820" y="200" text-anchor="middle" class="node-sub">auto-generated</text>
+
+      <!-- Flow arrows between nodes -->
+      <line x1="160" y1="170" x2="270" y2="170" class="flow-line" />
+      <polygon points="270,170 263,166 263,174" class="flow-arrow" />
+
+      <line x1="400" y1="170" x2="510" y2="170" class="flow-line" />
+      <polygon points="510,170 503,166 503,174" class="flow-arrow" />
+
+      <line x1="640" y1="170" x2="750" y2="170" class="flow-line" />
+      <polygon points="750,170 743,166 743,174" class="flow-arrow" />
+
+      <!-- Orchestrator block (Jenkins + IaC) wrapping the bottom -->
+      <rect x="40" y="260" width="840" height="70" rx="14" class="orchestrator-bg" />
+
+      <!-- Jenkins -->
+      <text x="180" y="290" class="node-text" text-anchor="middle">⚙ Jenkins CI/CD</text>
+      <text x="180" y="308" class="node-sub" text-anchor="middle">orchestrates every run</text>
+
+      <!-- divider -->
+      <line x1="370" y1="270" x2="370" y2="320" class="branch-line" />
+
+      <!-- Terraform / CloudFormation -->
+      <text x="550" y="290" class="node-text" text-anchor="middle">⌨ Terraform + CloudFormation</text>
+      <text x="550" y="308" class="node-sub" text-anchor="middle">provisions RDS · S3 · IAM</text>
+
+      <!-- divider -->
+      <line x1="730" y1="270" x2="730" y2="320" class="branch-line" />
+
+      <!-- Lambda -->
+      <text x="810" y="290" class="node-text" text-anchor="middle">λ Lambda</text>
+      <text x="810" y="308" class="node-sub" text-anchor="middle">event triggers</text>
+
+      <!-- Section label for orchestrator -->
+      <text x="460" y="252" class="stage-label" text-anchor="middle">ORCHESTRATION + INFRA</text>
+    </svg>
+  </div>
+  <div class="showcase-caption">
+    <span class="num mono">FIG. 01 — Architecture</span>
+    <span class="desc">A linear ETL flow with Jenkins driving every run and Terraform owning the cloud underneath.</span>
+  </div>
+</section>
+
+<section class="story reveal">
+  <div class="story-grid">
+    <div class="story-label">The Idea</div>
+    <div class="story-body">
+      <p>
+        Most teams sit on <strong>messy CSVs in someone's email</strong> and call it data. Querying any of it means an analyst manually cleaning the same file every week — until they leave and the whole workflow breaks.
+      </p>
+      <p>
+        Relay turns that mess into a real pipeline: raw sales data lands in S3, AWS Glue cleans and reshapes it, and the result loads into <strong>PostgreSQL on Amazon RDS</strong> where it's queryable, joinable, and trustworthy.
+      </p>
+      <p>
+        The whole stack is <strong>infrastructure-as-code</strong>. Terraform provisions everything. Jenkins runs the pipeline. No manual clicking through the AWS console, no "it worked on my machine," no lost data. Just a button that turns raw input into reports.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="stages reveal">
+  <div class="stages-label">Pipeline stages</div>
+  <h2 class="stages-title">Four steps, <em>all automated.</em></h2>
+  <div class="stages-list">
+
+    <div class="stage">
+      <div class="stage-num mono">/ 01</div>
+      <div class="stage-name">
+        Ingest
+        <span class="tech">S3 · Lambda</span>
+      </div>
+      <p class="stage-desc">
+        Raw sales CSVs land in an S3 bucket as the single source of truth. Lambda trigger functions sit alongside the bucket to kick off the downstream job when a refresh is needed, so the pipeline can be wired to fire on events instead of polling.
+      </p>
+    </div>
+
+    <div class="stage">
+      <div class="stage-num mono">/ 02</div>
+      <div class="stage-name">
+        Transform
+        <span class="tech">AWS Glue · Python</span>
+      </div>
+      <p class="stage-desc">
+        Glue jobs run Python scripts that clean nulls, normalize columns, cast types, and compute derived fields like tax. Heavy lifting happens here so the database stays fast and downstream queries stay simple.
+      </p>
+    </div>
+
+    <div class="stage">
+      <div class="stage-num mono">/ 03</div>
+      <div class="stage-name">
+        Load
+        <span class="tech">PostgreSQL · RDS</span>
+      </div>
+      <p class="stage-desc">
+        Transformed rows write into PostgreSQL on Amazon RDS, where the data is structured, queryable, and ready for joins or reports. No more raw CSVs floating around.
+      </p>
+    </div>
+
+    <div class="stage">
+      <div class="stage-num mono">/ 04</div>
+      <div class="stage-name">
+        Report
+        <span class="tech">Python · OpenPyXL</span>
+      </div>
+      <p class="stage-desc">
+        A Python step queries the loaded data and writes formatted Excel reports — the format business stakeholders actually open. Generated fresh every run so the numbers stay current.
+      </p>
+    </div>
+
+  </div>
+</section>
+
+<section class="features reveal">
+  <div class="features-header">
+    <div class="features-label">Why it holds up</div>
+    <h2 class="features-title">Designed for <em>boring reliability.</em></h2>
+  </div>
+  <div class="features-grid">
+    <div class="feature">
+      <div class="feature-num mono">/ 01</div>
+      <h3>Infrastructure as code</h3>
+      <p>Terraform + CloudFormation provision RDS, S3, and IAM. The entire cloud setup is one repo and one command — reproducible, reviewable, no console clicking.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-num mono">/ 02</div>
+      <h3>Repeatable Jenkins runs</h3>
+      <p>Pipeline-as-Code in Jenkins runs the same way every time. Failed stage? You see exactly where it broke. Need to backfill? Same job, different input.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-num mono">/ 03</div>
+      <h3>More than just moving rows</h3>
+      <p>The Glue layer doesn't just shuffle data — it computes derived fields like tax inline, so the loaded tables are already analysis-ready, not raw dumps with work left to do.</p>
+    </div>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="cta-row">
+    <div class="cta-text">Want to <em>poke around the code?</em></div>
+    <div class="cta-actions">
+      <a href="https://github.com/Hiu1111/aws-etl-project" target="_blank" rel="noopener" class="cta-btn primary">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+        View on GitHub
+      </a>
+      <a href="index.html" class="cta-btn">
+        ← Back to projects
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  © 2026 — Designed &amp; built by Hiu. Made with care.
+</footer>
+
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.05, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
