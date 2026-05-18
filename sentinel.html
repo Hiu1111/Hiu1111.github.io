@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sentinel — Hiu Cheung</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%230a0a0f'/%3E%3Ctext x='50' y='50' font-family='Georgia,serif' font-size='52' font-weight='500' fill='%23f5f5f7' text-anchor='middle' dominant-baseline='central'%3Eh%3Ctspan fill='%23d4ff3a' font-style='italic'%3Ec%3C/tspan%3E%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700;9..144,800;9..144,900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0a0a0f; --bg-elevated: #12121a; --surface: #1a1a26;
+    --border: rgba(255, 255, 255, 0.08); --border-strong: rgba(255, 255, 255, 0.16);
+    --text: #f5f5f7; --text-dim: #a1a1b3; --text-faint: #6b6b80;
+    --accent: #d4ff3a; --accent-glow: #d4ff3a40;
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Fraunces', Georgia, serif; font-weight: 400; line-height: 1.6;
+    min-height: 100vh; overflow-x: hidden; position: relative;
+  }
+  body::before {
+    content: ''; position: fixed; inset: 0;
+    background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 60px 60px; pointer-events: none; z-index: 0;
+    mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+  }
+  body::after {
+    content: ''; position: fixed; inset: 0;
+    background:
+      radial-gradient(circle at 20% 15%, rgba(107, 157, 255, 0.06) 0%, transparent 40%),
+      radial-gradient(circle at 80% 75%, rgba(212, 255, 58, 0.04) 0%, transparent 40%);
+    pointer-events: none; z-index: 0;
+  }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+  a { color: inherit; text-decoration: none; }
+
+  .topbar {
+    position: sticky; top: 0; left: 0; right: 0; padding: 1.5rem 2rem; z-index: 50;
+    backdrop-filter: blur(20px); background: rgba(10, 10, 15, 0.6);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner { max-width: 1280px; margin: 0 auto; width: 100%; display: flex; justify-content: space-between; align-items: center; }
+  .back-link { display: inline-flex; align-items: center; gap: 0.625rem; font-family: 'JetBrains Mono', monospace; font-size: 0.8125rem; color: var(--text-dim); transition: color 0.25s ease, gap 0.25s ease; }
+  .back-link:hover { color: var(--accent); gap: 1rem; }
+  .topbar-logo { font-family: 'JetBrains Mono', monospace; font-size: 0.875rem; font-weight: 600; color: var(--text); }
+  .topbar-logo span { color: var(--accent); }
+
+  .hero {
+    max-width: 1280px; margin: 0 auto; padding: 5rem 2rem 3rem;
+    position: relative; z-index: 1;
+    display: grid; grid-template-columns: 1.1fr 1fr; gap: 5rem; align-items: end;
+  }
+  .hero-left .eyebrow {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;
+    text-transform: uppercase; letter-spacing: 0.25em; color: var(--accent);
+    margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;
+  }
+  .hero-left .eyebrow::before { content: ''; width: 32px; height: 1px; background: var(--accent); }
+  .hero-title {
+    font-family: 'Fraunces', serif; font-size: clamp(4.5rem, 14vw, 11rem);
+    font-weight: 400; line-height: 0.9; letter-spacing: -0.04em; margin-bottom: 1.5rem;
+  }
+  .hero-title em {
+    background: linear-gradient(135deg, #6b9dff 0%, var(--accent) 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    font-style: italic; font-weight: 300;
+  }
+  .hero-tagline {
+    font-family: 'Fraunces', serif; font-size: clamp(1.25rem, 2.2vw, 1.625rem);
+    font-style: italic; font-weight: 300; line-height: 1.4; color: var(--text-dim); max-width: 30ch;
+  }
+  .hero-right { display: flex; flex-direction: column; gap: 1.75rem; padding-bottom: 0.5rem; }
+  .meta-block { border-left: 1px solid var(--border-strong); padding-left: 1.5rem; }
+  .meta-label { font-family: 'JetBrains Mono', monospace; font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.2em; color: var(--text-faint); margin-bottom: 0.625rem; }
+  .meta-value { font-family: 'Fraunces', serif; font-size: 1.0625rem; color: var(--text); line-height: 1.4; }
+  .meta-stack { display: flex; flex-wrap: wrap; gap: 0.375rem; margin-top: 0.5rem; }
+  .stack-pill { font-family: 'JetBrains Mono', monospace; font-size: 0.6875rem; padding: 0.25rem 0.625rem; border: 1px solid var(--border-strong); border-radius: 999px; color: var(--text-dim); }
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; gap: 3rem; padding-top: 3rem; }
+    .hero-right { flex-direction: row; flex-wrap: wrap; gap: 1.5rem 2rem; }
+    .meta-block { flex: 1 1 200px; }
+  }
+
+  /* DIAGRAM */
+  .showcase { max-width: 1280px; margin: 0 auto; padding: 2rem 2rem 4rem; position: relative; z-index: 1; }
+  .showcase-frame {
+    border-radius: 24px; overflow: hidden;
+    border: 1px solid var(--border-strong);
+    background:
+      radial-gradient(ellipse at top left, rgba(107, 157, 255, 0.06), transparent 50%),
+      radial-gradient(ellipse at bottom right, rgba(212, 255, 58, 0.06), transparent 50%),
+      var(--bg-elevated);
+    position: relative; box-shadow: 0 30px 80px rgba(0,0,0,0.5); padding: 3rem 2rem;
+  }
+  .arch-svg { width: 100%; height: auto; display: block; max-width: 1100px; margin: 0 auto; }
+  .arch-svg .node-bg { fill: var(--bg); stroke: var(--border-strong); stroke-width: 1.5; }
+  .arch-svg .node-text { font-family: 'JetBrains Mono', monospace; font-size: 13px; fill: var(--text); font-weight: 500; }
+  .arch-svg .node-sub { font-family: 'JetBrains Mono', monospace; font-size: 10px; fill: var(--text-faint); letter-spacing: 0.05em; }
+  .arch-svg .stage-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; fill: var(--accent); text-transform: uppercase; letter-spacing: 0.2em; font-weight: 500; }
+  .arch-svg .flow-line { stroke: var(--accent); stroke-width: 1.5; fill: none; stroke-dasharray: 4 4; animation: dash 1s linear infinite; }
+  @keyframes dash { to { stroke-dashoffset: -8; } }
+  .arch-svg .flow-arrow { fill: var(--accent); }
+  .arch-svg .branch-line { stroke: var(--border-strong); stroke-width: 1; fill: none; }
+  .arch-svg .orchestrator-bg { fill: rgba(212, 255, 58, 0.04); stroke: var(--accent); stroke-width: 1; stroke-dasharray: 3 3; }
+  .showcase-caption { margin-top: 1.25rem; display: flex; justify-content: space-between; align-items: baseline; gap: 2rem; flex-wrap: wrap; }
+  .showcase-caption .num { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--text-faint); letter-spacing: 0.1em; }
+  .showcase-caption .desc { font-family: 'Fraunces', serif; font-style: italic; color: var(--text-dim); font-size: 0.9375rem; }
+
+  /* STORY */
+  .story { max-width: 1280px; margin: 0 auto; padding: 5rem 2rem 4rem; position: relative; z-index: 1; }
+  .story-grid { display: grid; grid-template-columns: 240px 1fr; gap: 4rem; align-items: start; }
+  .story-label { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.25em; color: var(--accent); padding-top: 0.5rem; }
+  .story-body { max-width: 720px; }
+  .story-body p { font-family: 'Fraunces', serif; font-size: clamp(1.25rem, 1.8vw, 1.5rem); line-height: 1.55; color: var(--text); font-weight: 300; }
+  .story-body p + p { margin-top: 1.5rem; }
+  .story-body strong { color: var(--accent); font-weight: 500; }
+  @media (max-width: 900px) { .story-grid { grid-template-columns: 1fr; gap: 1rem; } }
+
+  /* CAPABILITIES (what it does) */
+  .caps { max-width: 1280px; margin: 0 auto; padding: 2rem 2rem 4rem; position: relative; z-index: 1; }
+  .caps-label { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.25em; color: var(--accent); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem; }
+  .caps-label::before { content: ''; width: 32px; height: 1px; background: var(--accent); }
+  .caps-title { font-family: 'Fraunces', serif; font-size: clamp(2rem, 4vw, 2.75rem); font-weight: 400; line-height: 1.1; letter-spacing: -0.02em; margin-bottom: 3rem; max-width: 600px; }
+  .caps-title em { font-style: italic; font-weight: 300; color: var(--accent); }
+  .caps-list { display: flex; flex-direction: column; }
+  .cap { display: grid; grid-template-columns: 80px 220px 1fr; gap: 2rem; padding: 2rem 0; border-top: 1px solid var(--border); align-items: start; }
+  .cap:last-child { border-bottom: 1px solid var(--border); }
+  .cap-num { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--accent); letter-spacing: 0.15em; padding-top: 0.4rem; }
+  .cap-name { font-family: 'Fraunces', serif; font-size: 1.375rem; font-weight: 500; color: var(--text); letter-spacing: -0.01em; }
+  .cap-name .tech { display: block; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--text-faint); font-weight: 400; margin-top: 0.5rem; letter-spacing: 0.05em; }
+  .cap-desc { font-size: 1rem; color: var(--text-dim); line-height: 1.7; max-width: 600px; padding-top: 0.3rem; }
+  @media (max-width: 768px) { .cap { grid-template-columns: 1fr; gap: 0.75rem; } .cap-num { padding-top: 0; } }
+
+  /* HONEST NOTE — for the "this is a starter" disclosure */
+  .note {
+    max-width: 1280px; margin: 0 auto; padding: 2rem; position: relative; z-index: 1;
+  }
+  .note-inner {
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 12px;
+    background: var(--bg-elevated);
+    padding: 1.5rem 1.75rem;
+    display: flex;
+    gap: 1rem;
+    align-items: start;
+  }
+  .note-icon {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--accent);
+    letter-spacing: 0.2em;
+    flex-shrink: 0;
+    padding-top: 0.1rem;
+  }
+  .note-text {
+    font-family: 'Fraunces', serif;
+    font-size: 1rem;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+  .note-text strong { color: var(--text); font-weight: 500; }
+
+  /* CTA */
+  .cta { max-width: 1280px; margin: 0 auto; padding: 3rem 2rem 6rem; position: relative; z-index: 1; }
+  .cta-row { display: flex; justify-content: space-between; align-items: center; padding-top: 3rem; border-top: 1px solid var(--border); flex-wrap: wrap; gap: 1.5rem; }
+  .cta-text { font-family: 'Fraunces', serif; font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 400; line-height: 1.2; max-width: 32ch; }
+  .cta-text em { font-style: italic; font-weight: 300; color: var(--accent); }
+  .cta-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+  .cta-btn { display: inline-flex; align-items: center; gap: 0.625rem; padding: 0.875rem 1.5rem; border-radius: 999px; font-family: 'JetBrains Mono', monospace; font-size: 0.8125rem; font-weight: 500; letter-spacing: 0.02em; border: 1px solid var(--border-strong); background: transparent; color: var(--text); transition: all 0.25s ease; cursor: pointer; }
+  .cta-btn:hover { border-color: var(--text); background: rgba(255,255,255,0.04); }
+  .cta-btn.primary { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+  .cta-btn.primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px var(--accent-glow); }
+  .cta-btn svg { transition: transform 0.25s ease; }
+  .cta-btn:hover svg { transform: translate(2px, -2px); }
+
+  footer { border-top: 1px solid var(--border); padding: 2rem; text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--text-faint); letter-spacing: 0.05em; position: relative; z-index: 1; }
+
+  .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.8s ease, transform 0.8s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a href="index.html" class="back-link"><span>←</span><span>All projects</span></a>
+    <a href="index.html" class="topbar-logo">Hiu <span>Cheung</span></a>
+  </div>
+</div>
+
+<section class="hero">
+  <div class="hero-left">
+    <div class="eyebrow">Project 04 / QA Automation</div>
+    <h1 class="hero-title">Sen<em>tinel</em></h1>
+    <p class="hero-tagline">A starter framework for running API and UI tests, ready to plug into a CI pipeline.</p>
+  </div>
+  <div class="hero-right">
+    <div class="meta-block">
+      <div class="meta-label">Role</div>
+      <div class="meta-value">Solo build — test automation</div>
+    </div>
+    <div class="meta-block">
+      <div class="meta-label">Stack</div>
+      <div class="meta-stack">
+        <span class="stack-pill">Java 17</span>
+        <span class="stack-pill">Maven</span>
+        <span class="stack-pill">JUnit 5</span>
+        <span class="stack-pill">Selenium</span>
+        <span class="stack-pill">RestAssured</span>
+        <span class="stack-pill">Jenkins</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="showcase reveal">
+  <div class="showcase-frame">
+    <svg class="arch-svg" viewBox="0 0 1000 360" xmlns="http://www.w3.org/2000/svg">
+      <text x="170" y="30" class="stage-label" text-anchor="middle">CODE</text>
+      <text x="430" y="30" class="stage-label" text-anchor="middle">TEST SUITES</text>
+      <text x="730" y="30" class="stage-label" text-anchor="middle">CI + REPORT</text>
+
+      <line x1="270" y1="20" x2="270" y2="280" class="branch-line" />
+      <line x1="600" y1="20" x2="600" y2="280" class="branch-line" />
+
+      <!-- Source repo -->
+      <rect x="60" y="130" width="170" height="80" rx="12" class="node-bg" />
+      <text x="145" y="165" text-anchor="middle" class="node-text">Source Repo</text>
+      <text x="145" y="183" text-anchor="middle" class="node-text">+ Tests</text>
+      <text x="145" y="200" text-anchor="middle" class="node-sub">Java · Maven · pom.xml</text>
+
+      <!-- API tests -->
+      <rect x="310" y="80" width="240" height="65" rx="12" class="node-bg" />
+      <text x="430" y="108" text-anchor="middle" class="node-text">API Smoke Tests</text>
+      <text x="430" y="128" text-anchor="middle" class="node-sub">RestAssured · JUnit 5</text>
+
+      <!-- UI tests -->
+      <rect x="310" y="195" width="240" height="65" rx="12" class="node-bg" />
+      <text x="430" y="223" text-anchor="middle" class="node-text">UI Tests</text>
+      <text x="430" y="243" text-anchor="middle" class="node-sub">Selenium · WebDriverManager</text>
+
+      <!-- Jenkins -->
+      <rect x="640" y="130" width="180" height="80" rx="12" class="node-bg" />
+      <text x="730" y="165" text-anchor="middle" class="node-text">Jenkins Pipeline</text>
+      <text x="730" y="183" text-anchor="middle" class="node-text">(Jenkinsfile)</text>
+      <text x="730" y="200" text-anchor="middle" class="node-sub">build · run · report</text>
+
+      <!-- S3 -->
+      <rect x="855" y="130" width="120" height="80" rx="12" class="node-bg" />
+      <text x="915" y="165" text-anchor="middle" class="node-text">S3 Upload</text>
+      <text x="915" y="183" text-anchor="middle" class="node-text">(optional)</text>
+      <text x="915" y="200" text-anchor="middle" class="node-sub">test reports</text>
+
+      <!-- Repo → API tests -->
+      <path d="M 230 165 C 270 165, 270 113, 310 113" class="flow-line" />
+      <polygon points="310,113 303,109 303,117" class="flow-arrow" />
+
+      <!-- Repo → UI tests -->
+      <path d="M 230 175 C 270 175, 270 227, 310 227" class="flow-line" />
+      <polygon points="310,227 303,223 303,231" class="flow-arrow" />
+
+      <!-- API tests → Jenkins -->
+      <path d="M 550 113 C 590 113, 600 165, 640 165" class="flow-line" />
+      <polygon points="640,165 633,161 633,169" class="flow-arrow" />
+
+      <!-- UI tests → Jenkins -->
+      <path d="M 550 227 C 590 227, 600 175, 640 175" class="flow-line" />
+      <polygon points="640,175 633,171 633,179" class="flow-arrow" />
+
+      <!-- Jenkins → S3 -->
+      <line x1="820" y1="170" x2="845" y2="170" class="flow-line" />
+      <polygon points="845,170 838,166 838,174" class="flow-arrow" />
+
+      <!-- Foundation band -->
+      <rect x="60" y="270" width="915" height="60" rx="14" class="orchestrator-bg" />
+      <text x="220" y="295" class="node-text" text-anchor="middle">⊕ Docker + docker-compose</text>
+      <text x="220" y="313" class="node-sub" text-anchor="middle">isolated test environments</text>
+      <line x1="400" y1="280" x2="400" y2="320" class="branch-line" />
+      <text x="600" y="295" class="node-text" text-anchor="middle">⚙ Maven Build System</text>
+      <text x="600" y="313" class="node-sub" text-anchor="middle">dependencies · test runner</text>
+      <line x1="800" y1="280" x2="800" y2="320" class="branch-line" />
+      <text x="900" y="295" class="node-text" text-anchor="middle">⚒ WebDriverMgr</text>
+      <text x="900" y="313" class="node-sub" text-anchor="middle">browser drivers</text>
+
+      <text x="517" y="262" class="stage-label" text-anchor="middle">FOUNDATION</text>
+    </svg>
+  </div>
+  <div class="showcase-caption">
+    <span class="num mono">FIG. 01 — Architecture</span>
+    <span class="desc">Two test layers, one Jenkins pipeline. Reports flow downstream to S3 when configured.</span>
+  </div>
+</section>
+
+<section class="story reveal">
+  <div class="story-grid">
+    <div class="story-label">The Idea</div>
+    <div class="story-body">
+      <p>
+        Most teams write tests once and then watch them rot — running locally, breaking on someone else's machine, never actually wired into deployment. Sentinel is built to skip that fate.
+      </p>
+      <p>
+        It's a <strong>lightweight, extensible framework</strong> that bundles API smoke tests and UI test automation behind one Maven build and one Jenkinsfile. Drop your project's tests in, point Jenkins at the repo, and you have a CI-runnable test suite from day one.
+      </p>
+      <p>
+        The goal isn't to be a full QA platform out of the box — it's to be the <strong>foundation</strong> that grows into one as a team adds real tests against a real app.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="caps reveal">
+  <div class="caps-label">What's in the box</div>
+  <h2 class="caps-title">Four building blocks, <em>ready to extend.</em></h2>
+  <div class="caps-list">
+
+    <div class="cap">
+      <div class="cap-num mono">/ 01</div>
+      <div class="cap-name">
+        API testing
+        <span class="tech">RestAssured · JUnit 5</span>
+      </div>
+      <p class="cap-desc">
+        A configured RestAssured + JUnit 5 setup for writing API smoke tests against any HTTP endpoint. The framework handles the boilerplate so each new test stays small.
+      </p>
+    </div>
+
+    <div class="cap">
+      <div class="cap-num mono">/ 02</div>
+      <div class="cap-name">
+        UI automation
+        <span class="tech">Selenium · WebDriverManager</span>
+      </div>
+      <p class="cap-desc">
+        Selenium WebDriver wired up with WebDriverManager so browser drivers get resolved automatically — no manual chromedriver paths, no setup pain when running across machines.
+      </p>
+    </div>
+
+    <div class="cap">
+      <div class="cap-num mono">/ 03</div>
+      <div class="cap-name">
+        CI pipeline
+        <span class="tech">Jenkinsfile · Pipeline-as-Code</span>
+      </div>
+      <p class="cap-desc">
+        A Jenkinsfile defines the build, test, and report stages declaratively. Same pipeline runs on every commit, so test results stay reproducible across machines and over time.
+      </p>
+    </div>
+
+    <div class="cap">
+      <div class="cap-num mono">/ 04</div>
+      <div class="cap-name">
+        Containerized runs
+        <span class="tech">Docker · docker-compose</span>
+      </div>
+      <p class="cap-desc">
+        A Dockerfile and docker-compose setup give you isolated test environments — useful for CI runners that don't have Java or browser drivers installed by default.
+      </p>
+    </div>
+
+  </div>
+</section>
+
+<div class="note">
+  <div class="note-inner">
+    <div class="note-icon mono">NOTE</div>
+    <p class="note-text">
+      Sentinel is a <strong>starter framework</strong>, not a turnkey QA suite. It's the scaffolding — config loader, page-object layout, CI pipeline, Docker setup — ready for real tests to be written against a real product. The point is that the boring parts are already solved.
+    </p>
+  </div>
+</div>
+
+<section class="cta">
+  <div class="cta-row">
+    <div class="cta-text">Want to <em>poke around the code?</em></div>
+    <div class="cta-actions">
+      <a href="https://github.com/Hiu1111/cloud-qa-platform" target="_blank" rel="noopener" class="cta-btn primary">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+        View on GitHub
+      </a>
+      <a href="index.html" class="cta-btn">← Back to projects</a>
+    </div>
+  </div>
+</section>
+
+<footer>© 2026 — Designed &amp; built by Hiu. Made with care.</footer>
+
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) { entry.target.classList.add('visible'); observer.unobserve(entry.target); }
+    });
+  }, { threshold: 0.05, rootMargin: '0px 0px -40px 0px' });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

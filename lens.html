@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lens — Hiu Cheung</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%230a0a0f'/%3E%3Ctext x='50' y='50' font-family='Georgia,serif' font-size='52' font-weight='500' fill='%23f5f5f7' text-anchor='middle' dominant-baseline='central'%3Eh%3Ctspan fill='%23d4ff3a' font-style='italic'%3Ec%3C/tspan%3E%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700;9..144,800;9..144,900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0a0a0f; --bg-elevated: #12121a; --surface: #1a1a26;
+    --border: rgba(255, 255, 255, 0.08); --border-strong: rgba(255, 255, 255, 0.16);
+    --text: #f5f5f7; --text-dim: #a1a1b3; --text-faint: #6b6b80;
+    --accent: #d4ff3a; --accent-glow: #d4ff3a40;
+    --pink: #ff6b9d;
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Fraunces', Georgia, serif; font-weight: 400; line-height: 1.6;
+    min-height: 100vh; overflow-x: hidden; position: relative;
+  }
+  body::before {
+    content: ''; position: fixed; inset: 0;
+    background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 60px 60px; pointer-events: none; z-index: 0;
+    mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+  }
+  body::after {
+    content: ''; position: fixed; inset: 0;
+    background:
+      radial-gradient(circle at 20% 15%, rgba(255, 107, 157, 0.08) 0%, transparent 40%),
+      radial-gradient(circle at 80% 75%, rgba(212, 255, 58, 0.04) 0%, transparent 40%);
+    pointer-events: none; z-index: 0;
+  }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+  a { color: inherit; text-decoration: none; }
+
+  .topbar {
+    position: sticky; top: 0; left: 0; right: 0; padding: 1.5rem 2rem; z-index: 50;
+    backdrop-filter: blur(20px); background: rgba(10, 10, 15, 0.6);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner { max-width: 1280px; margin: 0 auto; width: 100%; display: flex; justify-content: space-between; align-items: center; }
+  .back-link { display: inline-flex; align-items: center; gap: 0.625rem; font-family: 'JetBrains Mono', monospace; font-size: 0.8125rem; color: var(--text-dim); transition: color 0.25s ease, gap 0.25s ease; }
+  .back-link:hover { color: var(--accent); gap: 1rem; }
+  .topbar-logo { font-family: 'JetBrains Mono', monospace; font-size: 0.875rem; font-weight: 600; color: var(--text); }
+  .topbar-logo span { color: var(--accent); }
+
+  .hero {
+    max-width: 1280px; margin: 0 auto; padding: 5rem 2rem 3rem;
+    position: relative; z-index: 1;
+    display: grid; grid-template-columns: 1.1fr 1fr; gap: 5rem; align-items: end;
+  }
+  .hero-left .eyebrow {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;
+    text-transform: uppercase; letter-spacing: 0.25em; color: var(--accent);
+    margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;
+  }
+  .hero-left .eyebrow::before { content: ''; width: 32px; height: 1px; background: var(--accent); }
+  .hero-title {
+    font-family: 'Fraunces', serif; font-size: clamp(4.5rem, 14vw, 11rem);
+    font-weight: 400; line-height: 0.9; letter-spacing: -0.04em; margin-bottom: 1.5rem;
+  }
+  .hero-title em {
+    background: linear-gradient(135deg, var(--pink) 0%, var(--accent) 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    font-style: italic; font-weight: 300;
+  }
+  .hero-tagline {
+    font-family: 'Fraunces', serif; font-size: clamp(1.25rem, 2.2vw, 1.625rem);
+    font-style: italic; font-weight: 300; line-height: 1.4; color: var(--text-dim); max-width: 30ch;
+  }
+  .hero-right { display: flex; flex-direction: column; gap: 1.75rem; padding-bottom: 0.5rem; }
+  .meta-block { border-left: 1px solid var(--border-strong); padding-left: 1.5rem; }
+  .meta-label { font-family: 'JetBrains Mono', monospace; font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.2em; color: var(--text-faint); margin-bottom: 0.625rem; }
+  .meta-value { font-family: 'Fraunces', serif; font-size: 1.0625rem; color: var(--text); line-height: 1.4; }
+  .meta-stack { display: flex; flex-wrap: wrap; gap: 0.375rem; margin-top: 0.5rem; }
+  .stack-pill { font-family: 'JetBrains Mono', monospace; font-size: 0.6875rem; padding: 0.25rem 0.625rem; border: 1px solid var(--border-strong); border-radius: 999px; color: var(--text-dim); }
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; gap: 3rem; padding-top: 3rem; }
+    .hero-right { flex-direction: row; flex-wrap: wrap; gap: 1.5rem 2rem; }
+    .meta-block { flex: 1 1 200px; }
+  }
+
+  /* FACE SVG SHOWCASE — mock visualization of what the system "sees" */
+  .showcase { max-width: 1280px; margin: 0 auto; padding: 2rem 2rem 4rem; position: relative; z-index: 1; }
+  .showcase-frame {
+    border-radius: 24px; overflow: hidden;
+    border: 1px solid var(--border-strong);
+    background:
+      radial-gradient(ellipse at top left, rgba(255, 107, 157, 0.06), transparent 50%),
+      radial-gradient(ellipse at bottom right, rgba(212, 255, 58, 0.06), transparent 50%),
+      var(--bg-elevated);
+    position: relative; box-shadow: 0 30px 80px rgba(0,0,0,0.5); padding: 3rem 2rem;
+  }
+  .vis-svg { width: 100%; height: auto; display: block; max-width: 1100px; margin: 0 auto; }
+  .vis-svg .lab { font-family: 'JetBrains Mono', monospace; font-size: 10px; fill: var(--text-faint); letter-spacing: 0.1em; }
+  .vis-svg .lab-accent { font-family: 'JetBrains Mono', monospace; font-size: 10px; fill: var(--accent); letter-spacing: 0.15em; text-transform: uppercase; font-weight: 500; }
+  .vis-svg .frame-stroke { stroke: var(--border-strong); fill: none; stroke-width: 1; }
+  .vis-svg .frame-bg { fill: rgba(255,255,255,0.02); }
+  .vis-svg .bbox { stroke: var(--accent); fill: none; stroke-width: 2; stroke-dasharray: 4 4; animation: dash 1s linear infinite; }
+  .vis-svg .crosshair { stroke: var(--accent); stroke-width: 1; }
+  .vis-svg .emotion-text { font-family: 'JetBrains Mono', monospace; font-size: 14px; fill: var(--accent); font-weight: 600; letter-spacing: 0.1em; }
+  .vis-svg .pipe-node { fill: var(--bg); stroke: var(--border-strong); stroke-width: 1.5; }
+  .vis-svg .pipe-text { font-family: 'JetBrains Mono', monospace; font-size: 11px; fill: var(--text); font-weight: 500; }
+  .vis-svg .pipe-sub { font-family: 'JetBrains Mono', monospace; font-size: 9px; fill: var(--text-faint); }
+  .vis-svg .pipe-line { stroke: var(--accent); stroke-width: 1.5; fill: none; stroke-dasharray: 3 3; animation: dash 1s linear infinite; }
+  .vis-svg .pipe-arrow { fill: var(--accent); }
+  @keyframes dash { to { stroke-dashoffset: -8; } }
+  .showcase-caption { margin-top: 1.25rem; display: flex; justify-content: space-between; align-items: baseline; gap: 2rem; flex-wrap: wrap; }
+  .showcase-caption .num { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--text-faint); letter-spacing: 0.1em; }
+  .showcase-caption .desc { font-family: 'Fraunces', serif; font-style: italic; color: var(--text-dim); font-size: 0.9375rem; }
+
+  /* STORY */
+  .story { max-width: 1280px; margin: 0 auto; padding: 5rem 2rem 4rem; position: relative; z-index: 1; }
+  .story-grid { display: grid; grid-template-columns: 240px 1fr; gap: 4rem; align-items: start; }
+  .story-label { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.25em; color: var(--accent); padding-top: 0.5rem; }
+  .story-body { max-width: 720px; }
+  .story-body p { font-family: 'Fraunces', serif; font-size: clamp(1.25rem, 1.8vw, 1.5rem); line-height: 1.55; color: var(--text); font-weight: 300; }
+  .story-body p + p { margin-top: 1.5rem; }
+  .story-body strong { color: var(--accent); font-weight: 500; }
+  @media (max-width: 900px) { .story-grid { grid-template-columns: 1fr; gap: 1rem; } }
+
+  /* CODE BLOCK */
+  .code-section { max-width: 1280px; margin: 0 auto; padding: 2rem 2rem 4rem; position: relative; z-index: 1; }
+  .code-label { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.25em; color: var(--accent); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem; }
+  .code-label::before { content: ''; width: 32px; height: 1px; background: var(--accent); }
+  .code-frame {
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    background: #0d0d14;
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+  }
+  .code-header {
+    padding: 0.75rem 1.25rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: rgba(255,255,255,0.02);
+  }
+  .code-dots { display: flex; gap: 0.5rem; }
+  .code-dot { width: 11px; height: 11px; border-radius: 50%; background: var(--text-faint); opacity: 0.4; }
+  .code-filename { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--text-faint); letter-spacing: 0.05em; margin-left: 0.5rem; }
+  .code-body {
+    padding: 1.75rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8125rem;
+    line-height: 1.7;
+    color: var(--text-dim);
+    overflow-x: auto;
+    white-space: pre;
+  }
+  .code-body .kw { color: var(--pink); }
+  .code-body .fn { color: #6b9dff; }
+  .code-body .str { color: var(--accent); }
+  .code-body .com { color: var(--text-faint); font-style: italic; }
+  .code-meta { margin-top: 1rem; display: flex; align-items: baseline; gap: 1rem; }
+  .code-meta .num { font-family: 'JetBrains Mono', monospace; font-size: 0.6875rem; color: var(--accent); letter-spacing: 0.15em; flex-shrink: 0; }
+  .code-meta .label { font-family: 'Fraunces', serif; font-size: 1rem; color: var(--text-dim); font-style: italic; }
+
+  /* CAPABILITIES */
+  .caps { max-width: 1280px; margin: 0 auto; padding: 2rem 2rem 4rem; position: relative; z-index: 1; }
+  .caps-label { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.25em; color: var(--accent); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem; }
+  .caps-label::before { content: ''; width: 32px; height: 1px; background: var(--accent); }
+  .caps-title { font-family: 'Fraunces', serif; font-size: clamp(2rem, 4vw, 2.75rem); font-weight: 400; line-height: 1.1; letter-spacing: -0.02em; margin-bottom: 3rem; max-width: 600px; }
+  .caps-title em { font-style: italic; font-weight: 300; color: var(--accent); }
+  .caps-list { display: flex; flex-direction: column; }
+  .cap { display: grid; grid-template-columns: 80px 220px 1fr; gap: 2rem; padding: 2rem 0; border-top: 1px solid var(--border); align-items: start; }
+  .cap:last-child { border-bottom: 1px solid var(--border); }
+  .cap-num { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--accent); letter-spacing: 0.15em; padding-top: 0.4rem; }
+  .cap-name { font-family: 'Fraunces', serif; font-size: 1.375rem; font-weight: 500; color: var(--text); letter-spacing: -0.01em; }
+  .cap-name .tech { display: block; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--text-faint); font-weight: 400; margin-top: 0.5rem; letter-spacing: 0.05em; }
+  .cap-desc { font-size: 1rem; color: var(--text-dim); line-height: 1.7; max-width: 600px; padding-top: 0.3rem; }
+  @media (max-width: 768px) { .cap { grid-template-columns: 1fr; gap: 0.75rem; } .cap-num { padding-top: 0; } }
+
+  /* HONEST NOTE */
+  .note { max-width: 1280px; margin: 0 auto; padding: 2rem; position: relative; z-index: 1; }
+  .note-inner { border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 12px; background: var(--bg-elevated); padding: 1.5rem 1.75rem; display: flex; gap: 1rem; align-items: start; }
+  .note-icon { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--accent); letter-spacing: 0.2em; flex-shrink: 0; padding-top: 0.1rem; }
+  .note-text { font-family: 'Fraunces', serif; font-size: 1rem; color: var(--text-dim); line-height: 1.6; }
+  .note-text strong { color: var(--text); font-weight: 500; }
+  .note-text .future { display: block; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border); font-size: 0.9375rem; }
+
+  /* CTA */
+  .cta { max-width: 1280px; margin: 0 auto; padding: 3rem 2rem 6rem; position: relative; z-index: 1; }
+  .cta-row { display: flex; justify-content: space-between; align-items: center; padding-top: 3rem; border-top: 1px solid var(--border); flex-wrap: wrap; gap: 1.5rem; }
+  .cta-text { font-family: 'Fraunces', serif; font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 400; line-height: 1.2; max-width: 32ch; }
+  .cta-text em { font-style: italic; font-weight: 300; color: var(--accent); }
+  .cta-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+  .cta-btn { display: inline-flex; align-items: center; gap: 0.625rem; padding: 0.875rem 1.5rem; border-radius: 999px; font-family: 'JetBrains Mono', monospace; font-size: 0.8125rem; font-weight: 500; letter-spacing: 0.02em; border: 1px solid var(--border-strong); background: transparent; color: var(--text); transition: all 0.25s ease; cursor: pointer; }
+  .cta-btn:hover { border-color: var(--text); background: rgba(255,255,255,0.04); }
+  .cta-btn.primary { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+  .cta-btn.primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px var(--accent-glow); }
+  .cta-btn svg { transition: transform 0.25s ease; }
+  .cta-btn:hover svg { transform: translate(2px, -2px); }
+
+  footer { border-top: 1px solid var(--border); padding: 2rem; text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--text-faint); letter-spacing: 0.05em; position: relative; z-index: 1; }
+
+  .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.8s ease, transform 0.8s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a href="index.html" class="back-link"><span>←</span><span>All projects</span></a>
+    <a href="index.html" class="topbar-logo">Hiu <span>Cheung</span></a>
+  </div>
+</div>
+
+<section class="hero">
+  <div class="hero-left">
+    <div class="eyebrow">Project 05 / Computer Vision</div>
+    <h1 class="hero-title">Le<em>ns</em></h1>
+    <p class="hero-tagline">A small experiment in turning live webcam frames into emotion labels.</p>
+  </div>
+  <div class="hero-right">
+    <div class="meta-block">
+      <div class="meta-label">Role</div>
+      <div class="meta-value">Solo build — exploration</div>
+    </div>
+    <div class="meta-block">
+      <div class="meta-label">Stack</div>
+      <div class="meta-stack">
+        <span class="stack-pill">Python</span>
+        <span class="stack-pill">OpenCV</span>
+        <span class="stack-pill">DeepFace</span>
+        <span class="stack-pill">MTCNN</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="showcase reveal">
+  <div class="showcase-frame">
+    <svg class="vis-svg" viewBox="0 0 1000 360" xmlns="http://www.w3.org/2000/svg">
+      <!-- Stage labels -->
+      <text x="170" y="30" class="lab-accent" text-anchor="middle">FRAME</text>
+      <text x="430" y="30" class="lab-accent" text-anchor="middle">DETECT</text>
+      <text x="700" y="30" class="lab-accent" text-anchor="middle">ANALYZE</text>
+      <text x="900" y="30" class="lab-accent" text-anchor="middle">LABEL</text>
+
+      <line x1="270" y1="20" x2="270" y2="280" class="frame-stroke" />
+      <line x1="555" y1="20" x2="555" y2="280" class="frame-stroke" />
+      <line x1="810" y1="20" x2="810" y2="280" class="frame-stroke" />
+
+      <!-- Webcam frame mock (just a stylized frame, no face drawing) -->
+      <rect x="80" y="80" width="180" height="180" rx="8" class="frame-bg" stroke="rgba(255,255,255,0.16)" stroke-width="1.5" fill-opacity="1"/>
+      <!-- corner brackets -->
+      <path d="M 90 95 L 90 85 L 100 85" class="crosshair" />
+      <path d="M 240 85 L 250 85 L 250 95" class="crosshair" />
+      <path d="M 90 245 L 90 255 L 100 255" class="crosshair" />
+      <path d="M 240 255 L 250 255 L 250 245" class="crosshair" />
+      <text x="170" y="178" class="lab" text-anchor="middle">cv2.VideoCapture(0)</text>
+
+      <!-- MTCNN bounding box detection visualization -->
+      <rect x="350" y="80" width="180" height="180" rx="8" class="frame-bg" stroke="rgba(255,255,255,0.16)" stroke-width="1.5"/>
+      <!-- detected face bounding box -->
+      <rect x="380" y="115" width="120" height="120" class="bbox" />
+      <text x="440" y="105" class="lab-accent" text-anchor="middle" font-size="9">FACE DETECTED</text>
+      <text x="440" y="178" class="lab" text-anchor="middle">MTCNN</text>
+
+      <!-- DeepFace analysis -->
+      <rect x="610" y="100" width="180" height="140" rx="12" class="pipe-node" />
+      <text x="700" y="135" text-anchor="middle" class="pipe-text">DeepFace.analyze</text>
+      <text x="700" y="158" text-anchor="middle" class="pipe-sub">actions=['emotion']</text>
+      <text x="700" y="178" text-anchor="middle" class="pipe-sub">backend='mtcnn'</text>
+      <text x="700" y="210" text-anchor="middle" class="pipe-sub">enforce_detection=False</text>
+
+      <!-- Output label -->
+      <rect x="830" y="120" width="140" height="100" rx="12" class="pipe-node" />
+      <text x="900" y="160" text-anchor="middle" class="emotion-text">happy</text>
+      <text x="900" y="190" text-anchor="middle" class="pipe-sub">dominant_emotion</text>
+
+      <!-- Flow arrows -->
+      <line x1="260" y1="170" x2="345" y2="170" class="pipe-line" />
+      <polygon points="345,170 338,166 338,174" class="pipe-arrow" />
+
+      <line x1="530" y1="170" x2="605" y2="170" class="pipe-line" />
+      <polygon points="605,170 598,166 598,174" class="pipe-arrow" />
+
+      <line x1="790" y1="170" x2="825" y2="170" class="pipe-line" />
+      <polygon points="825,170 818,166 818,174" class="pipe-arrow" />
+
+      <!-- Foundation note -->
+      <text x="500" y="320" class="lab" text-anchor="middle">A loop reads webcam frames → MTCNN locates faces → DeepFace classifies emotion → result printed to console</text>
+    </svg>
+  </div>
+  <div class="showcase-caption">
+    <span class="num mono">FIG. 01 — Pipeline</span>
+    <span class="desc">Each frame moves through four steps. The dominant emotion comes out the other end.</span>
+  </div>
+</section>
+
+<section class="story reveal">
+  <div class="story-grid">
+    <div class="story-label">The Idea</div>
+    <div class="story-body">
+      <p>
+        Webcams and pretrained models are everywhere, but stitching them together into something that <strong>reads emotions in real time</strong> is its own small puzzle. Lens is the experiment that ties them together.
+      </p>
+      <p>
+        OpenCV opens the webcam and reads frames in a loop. MTCNN locates the face inside each frame. DeepFace then runs emotion classification on the cropped region and returns the dominant label — happy, sad, neutral, and so on.
+      </p>
+      <p>
+        Built mainly as a hands-on way to learn <strong>computer vision and the OpenCV + DeepFace stack</strong>, with an eye toward future projects like emotion-aware media players or sentiment analysis during user interactions.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="code-section reveal">
+  <div class="code-label">The core loop</div>
+  <div class="code-frame">
+    <div class="code-header">
+      <div class="code-dots">
+        <span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span>
+      </div>
+      <span class="code-filename">emotion_detection.py</span>
+    </div>
+    <div class="code-body"><span class="kw">import</span> cv2
+<span class="kw">from</span> deepface <span class="kw">import</span> DeepFace
+
+<span class="kw">def</span> <span class="fn">check_emotion</span>(frame):
+    <span class="com"># run DeepFace with MTCNN backend on the captured frame</span>
+    analysis = DeepFace.<span class="fn">analyze</span>(
+        frame,
+        actions=[<span class="str">'emotion'</span>],
+        enforce_detection=<span class="kw">False</span>,
+        detector_backend=<span class="str">'mtcnn'</span>
+    )
+    <span class="com"># handle both single-face and multi-face return types</span>
+    <span class="kw">if</span> <span class="fn">isinstance</span>(analysis, list):
+        dominant = analysis[0][<span class="str">'dominant_emotion'</span>]
+    <span class="kw">else</span>:
+        dominant = analysis[<span class="str">'dominant_emotion'</span>]
+    <span class="fn">print</span>(<span class="str">f"Detected emotion: {dominant}"</span>)
+    <span class="kw">return</span> dominant
+
+<span class="kw">def</span> <span class="fn">main</span>():
+    capture = cv2.<span class="fn">VideoCapture</span>(<span class="str">0</span>)
+    <span class="kw">while</span> <span class="kw">True</span>:
+        captured, frame = capture.<span class="fn">read</span>()
+        <span class="fn">check_emotion</span>(frame)
+
+<span class="kw">if</span> __name__ == <span class="str">"__main__"</span>:
+    <span class="fn">main</span>()</div>
+  </div>
+  <div class="code-meta">
+    <span class="num mono">FIG. 02</span>
+    <span class="label">The whole thing fits on one screen. MTCNN handles tough lighting; DeepFace handles the rest.</span>
+  </div>
+</section>
+
+<section class="caps reveal">
+  <div class="caps-label">What's happening under the hood</div>
+  <h2 class="caps-title">Three libraries, <em>one tight loop.</em></h2>
+  <div class="caps-list">
+
+    <div class="cap">
+      <div class="cap-num mono">/ 01</div>
+      <div class="cap-name">
+        Frame capture
+        <span class="tech">OpenCV · cv2.VideoCapture</span>
+      </div>
+      <p class="cap-desc">
+        OpenCV opens the default webcam and reads raw frames in a loop. Each frame is a NumPy array passed straight into the analysis function — no intermediate file writes, no extra buffers.
+      </p>
+    </div>
+
+    <div class="cap">
+      <div class="cap-num mono">/ 02</div>
+      <div class="cap-name">
+        Face localization
+        <span class="tech">MTCNN</span>
+      </div>
+      <p class="cap-desc">
+        MTCNN is configured as the detector backend because it holds up better than the default Haar cascades — especially in low light or when faces aren't perfectly centered. More reliable detection means fewer false negatives.
+      </p>
+    </div>
+
+    <div class="cap">
+      <div class="cap-num mono">/ 03</div>
+      <div class="cap-name">
+        Emotion classification
+        <span class="tech">DeepFace</span>
+      </div>
+      <p class="cap-desc">
+        DeepFace runs the pretrained emotion model and returns a dictionary of scores. The code grabs the dominant emotion and handles both single-face and multi-face cases — so a list response from multiple people in frame doesn't break the loop.
+      </p>
+    </div>
+
+  </div>
+</section>
+
+<div class="note">
+  <div class="note-inner">
+    <div class="note-icon mono">NOTE</div>
+    <p class="note-text">
+      <strong>Honest status:</strong> the emotion detection loop runs and prints results to the console correctly. The <span class="mono" style="color:var(--text);font-size:0.9em;">cv2.imshow</span> call for displaying the live video frame is a known issue and is currently commented out — analysis works, the visual playback doesn't.
+      <span class="future">
+        <strong>What's next:</strong> fix the display issue, then build on top of it — an emotion-counter, an emotion-aware music player, or a sentiment overlay during conversations.
+      </span>
+    </p>
+  </div>
+</div>
+
+<section class="cta">
+  <div class="cta-row">
+    <div class="cta-text">Want to <em>poke around the code?</em></div>
+    <div class="cta-actions">
+      <a href="https://github.com/Hiu1111/Emotion-Recognition" target="_blank" rel="noopener" class="cta-btn primary">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+        View on GitHub
+      </a>
+      <a href="index.html" class="cta-btn">← Back to projects</a>
+    </div>
+  </div>
+</section>
+
+<footer>© 2026 — Designed &amp; built by Hiu. Made with care.</footer>
+
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) { entry.target.classList.add('visible'); observer.unobserve(entry.target); }
+    });
+  }, { threshold: 0.05, rootMargin: '0px 0px -40px 0px' });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
