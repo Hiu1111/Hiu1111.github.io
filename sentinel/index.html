@@ -22,6 +22,7 @@
     font-family: 'Fraunces', Georgia, serif; font-weight: 400; line-height: 1.6;
     min-height: 100vh; overflow-x: hidden; position: relative;
   }
+  ::selection { background: var(--accent); color: var(--bg); }
   body::before {
     content: ''; position: fixed; inset: 0;
     background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
@@ -52,8 +53,9 @@
   .hero {
     max-width: 1280px; margin: 0 auto; padding: 5rem 2rem 3rem;
     position: relative; z-index: 1;
-    display: grid; grid-template-columns: 1.1fr 1fr; gap: 5rem; align-items: end;
+    display: grid; grid-template-columns: 1.3fr 1fr; gap: 4rem; align-items: end;
   }
+  .hero-left { min-width: 0; }
   .hero-left .eyebrow {
     font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;
     text-transform: uppercase; letter-spacing: 0.25em; color: var(--accent);
@@ -61,8 +63,15 @@
   }
   .hero-left .eyebrow::before { content: ''; width: 32px; height: 1px; background: var(--accent); }
   .hero-title {
-    font-family: 'Fraunces', serif; font-size: clamp(4.5rem, 14vw, 11rem);
-    font-weight: 400; line-height: 0.9; letter-spacing: -0.04em; margin-bottom: 1.5rem;
+    font-family: 'Fraunces', serif;
+    font-size: clamp(3rem, 9vw, 7rem);
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    margin-bottom: 1.5rem;
+    padding-right: 0.2em;
+    white-space: nowrap;
+    overflow: visible;
   }
   .hero-title em {
     background: linear-gradient(135deg, #6b9dff 0%, var(--accent) 100%);
@@ -83,9 +92,9 @@
     .hero { grid-template-columns: 1fr; gap: 3rem; padding-top: 3rem; }
     .hero-right { flex-direction: row; flex-wrap: wrap; gap: 1.5rem 2rem; }
     .meta-block { flex: 1 1 200px; }
+    .hero-title { white-space: normal; }
   }
 
-  /* DIAGRAM */
   .showcase { max-width: 1280px; margin: 0 auto; padding: 2rem 2rem 4rem; position: relative; z-index: 1; }
   .showcase-frame {
     border-radius: 24px; overflow: hidden;
@@ -110,7 +119,6 @@
   .showcase-caption .num { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--text-faint); letter-spacing: 0.1em; }
   .showcase-caption .desc { font-family: 'Fraunces', serif; font-style: italic; color: var(--text-dim); font-size: 0.9375rem; }
 
-  /* STORY */
   .story { max-width: 1280px; margin: 0 auto; padding: 5rem 2rem 4rem; position: relative; z-index: 1; }
   .story-grid { display: grid; grid-template-columns: 240px 1fr; gap: 4rem; align-items: start; }
   .story-label { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.25em; color: var(--accent); padding-top: 0.5rem; }
@@ -120,7 +128,6 @@
   .story-body strong { color: var(--accent); font-weight: 500; }
   @media (max-width: 900px) { .story-grid { grid-template-columns: 1fr; gap: 1rem; } }
 
-  /* CAPABILITIES (what it does) */
   .caps { max-width: 1280px; margin: 0 auto; padding: 2rem 2rem 4rem; position: relative; z-index: 1; }
   .caps-label { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.25em; color: var(--accent); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem; }
   .caps-label::before { content: ''; width: 32px; height: 1px; background: var(--accent); }
@@ -135,37 +142,12 @@
   .cap-desc { font-size: 1rem; color: var(--text-dim); line-height: 1.7; max-width: 600px; padding-top: 0.3rem; }
   @media (max-width: 768px) { .cap { grid-template-columns: 1fr; gap: 0.75rem; } .cap-num { padding-top: 0; } }
 
-  /* HONEST NOTE — for the "this is a starter" disclosure */
-  .note {
-    max-width: 1280px; margin: 0 auto; padding: 2rem; position: relative; z-index: 1;
-  }
-  .note-inner {
-    border: 1px solid var(--border);
-    border-left: 3px solid var(--accent);
-    border-radius: 12px;
-    background: var(--bg-elevated);
-    padding: 1.5rem 1.75rem;
-    display: flex;
-    gap: 1rem;
-    align-items: start;
-  }
-  .note-icon {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.75rem;
-    color: var(--accent);
-    letter-spacing: 0.2em;
-    flex-shrink: 0;
-    padding-top: 0.1rem;
-  }
-  .note-text {
-    font-family: 'Fraunces', serif;
-    font-size: 1rem;
-    color: var(--text-dim);
-    line-height: 1.6;
-  }
+  .note { max-width: 1280px; margin: 0 auto; padding: 2rem; position: relative; z-index: 1; }
+  .note-inner { border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 12px; background: var(--bg-elevated); padding: 1.5rem 1.75rem; display: flex; gap: 1rem; align-items: start; }
+  .note-icon { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--accent); letter-spacing: 0.2em; flex-shrink: 0; padding-top: 0.1rem; }
+  .note-text { font-family: 'Fraunces', serif; font-size: 1rem; color: var(--text-dim); line-height: 1.6; }
   .note-text strong { color: var(--text); font-weight: 500; }
 
-  /* CTA */
   .cta { max-width: 1280px; margin: 0 auto; padding: 3rem 2rem 6rem; position: relative; z-index: 1; }
   .cta-row { display: flex; justify-content: space-between; align-items: center; padding-top: 3rem; border-top: 1px solid var(--border); flex-wrap: wrap; gap: 1.5rem; }
   .cta-text { font-family: 'Fraunces', serif; font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 400; line-height: 1.2; max-width: 32ch; }
@@ -224,59 +206,36 @@
       <text x="170" y="30" class="stage-label" text-anchor="middle">CODE</text>
       <text x="430" y="30" class="stage-label" text-anchor="middle">TEST SUITES</text>
       <text x="730" y="30" class="stage-label" text-anchor="middle">CI + REPORT</text>
-
       <line x1="270" y1="20" x2="270" y2="280" class="branch-line" />
       <line x1="600" y1="20" x2="600" y2="280" class="branch-line" />
-
-      <!-- Source repo -->
       <rect x="60" y="130" width="170" height="80" rx="12" class="node-bg" />
       <text x="145" y="165" text-anchor="middle" class="node-text">Source Repo</text>
       <text x="145" y="183" text-anchor="middle" class="node-text">+ Tests</text>
       <text x="145" y="200" text-anchor="middle" class="node-sub">Java · Maven · pom.xml</text>
-
-      <!-- API tests -->
       <rect x="310" y="80" width="240" height="65" rx="12" class="node-bg" />
       <text x="430" y="108" text-anchor="middle" class="node-text">API Smoke Tests</text>
       <text x="430" y="128" text-anchor="middle" class="node-sub">RestAssured · JUnit 5</text>
-
-      <!-- UI tests -->
       <rect x="310" y="195" width="240" height="65" rx="12" class="node-bg" />
       <text x="430" y="223" text-anchor="middle" class="node-text">UI Tests</text>
       <text x="430" y="243" text-anchor="middle" class="node-sub">Selenium · WebDriverManager</text>
-
-      <!-- Jenkins -->
       <rect x="640" y="130" width="180" height="80" rx="12" class="node-bg" />
       <text x="730" y="165" text-anchor="middle" class="node-text">Jenkins Pipeline</text>
       <text x="730" y="183" text-anchor="middle" class="node-text">(Jenkinsfile)</text>
       <text x="730" y="200" text-anchor="middle" class="node-sub">build · run · report</text>
-
-      <!-- S3 -->
       <rect x="855" y="130" width="120" height="80" rx="12" class="node-bg" />
       <text x="915" y="165" text-anchor="middle" class="node-text">S3 Upload</text>
       <text x="915" y="183" text-anchor="middle" class="node-text">(optional)</text>
       <text x="915" y="200" text-anchor="middle" class="node-sub">test reports</text>
-
-      <!-- Repo → API tests -->
       <path d="M 230 165 C 270 165, 270 113, 310 113" class="flow-line" />
       <polygon points="310,113 303,109 303,117" class="flow-arrow" />
-
-      <!-- Repo → UI tests -->
       <path d="M 230 175 C 270 175, 270 227, 310 227" class="flow-line" />
       <polygon points="310,227 303,223 303,231" class="flow-arrow" />
-
-      <!-- API tests → Jenkins -->
       <path d="M 550 113 C 590 113, 600 165, 640 165" class="flow-line" />
       <polygon points="640,165 633,161 633,169" class="flow-arrow" />
-
-      <!-- UI tests → Jenkins -->
       <path d="M 550 227 C 590 227, 600 175, 640 175" class="flow-line" />
       <polygon points="640,175 633,171 633,179" class="flow-arrow" />
-
-      <!-- Jenkins → S3 -->
       <line x1="820" y1="170" x2="845" y2="170" class="flow-line" />
       <polygon points="845,170 838,166 838,174" class="flow-arrow" />
-
-      <!-- Foundation band -->
       <rect x="60" y="270" width="915" height="60" rx="14" class="orchestrator-bg" />
       <text x="220" y="295" class="node-text" text-anchor="middle">⊕ Docker + docker-compose</text>
       <text x="220" y="313" class="node-sub" text-anchor="middle">isolated test environments</text>
@@ -286,7 +245,6 @@
       <line x1="800" y1="280" x2="800" y2="320" class="branch-line" />
       <text x="900" y="295" class="node-text" text-anchor="middle">⚒ WebDriverMgr</text>
       <text x="900" y="313" class="node-sub" text-anchor="middle">browser drivers</text>
-
       <text x="517" y="262" class="stage-label" text-anchor="middle">FOUNDATION</text>
     </svg>
   </div>
@@ -317,51 +275,38 @@
   <div class="caps-label">What's in the box</div>
   <h2 class="caps-title">Four building blocks, <em>ready to extend.</em></h2>
   <div class="caps-list">
-
     <div class="cap">
       <div class="cap-num mono">/ 01</div>
       <div class="cap-name">
         API testing
         <span class="tech">RestAssured · JUnit 5</span>
       </div>
-      <p class="cap-desc">
-        A configured RestAssured + JUnit 5 setup for writing API smoke tests against any HTTP endpoint. The framework handles the boilerplate so each new test stays small.
-      </p>
+      <p class="cap-desc">A configured RestAssured + JUnit 5 setup for writing API smoke tests against any HTTP endpoint. The framework handles the boilerplate so each new test stays small.</p>
     </div>
-
     <div class="cap">
       <div class="cap-num mono">/ 02</div>
       <div class="cap-name">
         UI automation
         <span class="tech">Selenium · WebDriverManager</span>
       </div>
-      <p class="cap-desc">
-        Selenium WebDriver wired up with WebDriverManager so browser drivers get resolved automatically — no manual chromedriver paths, no setup pain when running across machines.
-      </p>
+      <p class="cap-desc">Selenium WebDriver wired up with WebDriverManager so browser drivers get resolved automatically — no manual chromedriver paths, no setup pain when running across machines.</p>
     </div>
-
     <div class="cap">
       <div class="cap-num mono">/ 03</div>
       <div class="cap-name">
         CI pipeline
         <span class="tech">Jenkinsfile · Pipeline-as-Code</span>
       </div>
-      <p class="cap-desc">
-        A Jenkinsfile defines the build, test, and report stages declaratively. Same pipeline runs on every commit, so test results stay reproducible across machines and over time.
-      </p>
+      <p class="cap-desc">A Jenkinsfile defines the build, test, and report stages declaratively. Same pipeline runs on every commit, so test results stay reproducible across machines and over time.</p>
     </div>
-
     <div class="cap">
       <div class="cap-num mono">/ 04</div>
       <div class="cap-name">
         Containerized runs
         <span class="tech">Docker · docker-compose</span>
       </div>
-      <p class="cap-desc">
-        A Dockerfile and docker-compose setup give you isolated test environments — useful for CI runners that don't have Java or browser drivers installed by default.
-      </p>
+      <p class="cap-desc">A Dockerfile and docker-compose setup give you isolated test environments — useful for CI runners that don't have Java or browser drivers installed by default.</p>
     </div>
-
   </div>
 </section>
 
